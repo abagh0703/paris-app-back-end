@@ -1,5 +1,8 @@
-const debug = require('debug');
-module.exports.debug = debug;
+require('dotenv').config();
+
+//logger.log, trace, debug, info, warn, error
+const logger = require('tracer').colorConsole({level: 'log'});
+module.exports.logger = logger;
 
 function objectHasProperties(obj, keysArray) {
     if (!obj || !keysArray || !Array.isArray(keysArray) || typeof obj !==
@@ -11,3 +14,18 @@ function objectHasProperties(obj, keysArray) {
     }));
 }
 module.exports.objectHasProperties = objectHasProperties;
+
+function getCheckInPassword(){
+    return process.env.CHECKINPASSWORD;
+}
+module.exports.getCheckInPassword = getCheckInPassword;
+
+function getTwilioSid(){
+    return process.env.TWILIOSID;
+}
+module.exports.getTwilioSid = getTwilioSid;
+
+function getTwilioToken(){
+    return process.env.TWILIOTOKEN;
+}
+module.exports.getTwilioToken = getTwilioToken;
