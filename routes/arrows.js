@@ -188,7 +188,7 @@ router.delete('/:arrowId', (req, res) => {
         const isWithin = isWithinTarget(userLat, userLong, arrowLat, arrowLong);
         if ((isWithin && shouldBeWithin) || (!isWithin && shouldNotBeWithin)){
             updateArrowTime(arrow);
-            return res.send({accepted: true});
+            return res.send({accepted: true, reason: 'Successfully checked in!'});
         }
         else {
             const metersFromTarget = getMetersFromTarget(userLat, userLong, arrowLat, arrowLong);
