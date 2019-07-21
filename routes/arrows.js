@@ -9,7 +9,7 @@ const { arrowModel }= require('../database');
 const minutesOfBuffer = 10;
 const distanceCheckBufferMeters = 200;
 
-router.get('/', function(req, res) {
+router.get('/arrows', function(req, res) {
     arrowModel.find({}, (err, arrows) => {
         if (err) {
             logger.error(err);
@@ -23,7 +23,8 @@ router.get('/', function(req, res) {
 
 // To be called by a service that pings this endpoint every minute. I could use
 // a cron job, but this was simpler.
-router.get('/check', (req, res) => {
+// USED TO BE /arrows/check
+router.get('/', (req, res) => {
     arrowModel.find({}, (err, arrows) => {
         if (err) {
             logger.error(err);
@@ -128,7 +129,7 @@ function convertMsToMinutes(msTime){
     return (msTime/1000)/60;
 }
 
-router.post('/', (req, res) => {
+router.post('/arrows', (req, res) => {
     const data = req.body;
     if (data.until && timestampIsNotInMs(data.until)) {
         logger.warn(data.until + ' ("until" value) is not in ms');
@@ -164,7 +165,7 @@ function timestampIsNotInMs(time) {
 /**
  * Body: {latitude: 111, longitude: 111, checkInPassword: 'xxx'}
  */
-router.delete('/:arrowId', (req, res) => {
+router.delete('/arrows/:arrowId', (req, res) => {
     const {arrowId} = req.params;
     const storedCheckInPassword = getCheckInPassword();
     if (req.body.checkInPassword !== storedCheckInPassword) {
