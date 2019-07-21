@@ -130,7 +130,7 @@ function convertMsToMinutes(msTime){
 
 router.post('/', (req, res) => {
     const data = req.body;
-    if (timestampIsNotInMs(data.until)) {
+    if (data.until && timestampIsNotInMs(data.until)) {
         logger.warn(data.until + ' ("until" value) is not in ms');
         return res.status(422).send(data.until + ' ("until" value) is not in ms');
     }
