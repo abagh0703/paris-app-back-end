@@ -31,7 +31,7 @@ router.get('/', (req, res) => {
             return [];
         }
         arrows.forEach(handleArrowCheck);
-        return res.send('Done checking!');
+        return res.send('Done checking ' + arrows.length + ' arrow(s)');
     });
 });
 
