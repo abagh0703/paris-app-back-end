@@ -95,8 +95,9 @@ function addDays(timeInMs, numDays){
 function executePenalty(){
     logger.warn('executing penalty');
     // const phoneNums = [process.env.OWNERPHONE, process.env.PERSON1PHONE, process.env.PERSON2PHONE];
-    // TODO remove comment aboove and delete below when ready for production!
-    const phoneNums = [process.env.OWNERPHONE];
+    // TODO remove comment above and delete below when ready for production!
+    const phoneNums = [process.env.OWNERPHONE, process.env.PERSON1PHONE];
+    // const phoneNums = [process.env.OWNERPHONE];
     phoneNums.forEach((phoneNum) => {
         client.messages
         .create({
