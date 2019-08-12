@@ -39,19 +39,19 @@ function handleArrowCheck(arrow) {
     if (isLate(arrow.checkInTime)){
         logger.debug('is late');
         executePenalty();
-        if (arrowIsInPast(arrow.until)){
+        if (arrowIsExpired(arrow.until)){
             deleteArrow(arrow._id);
             return;
         }
         if (arrow.dateType === 'once'){
             deleteArrow(arrow._id);
         }
-        else if (arrow.dateType === 'daily' || arrow.dateType === 'weekly'){
+        else {
             logger.debug('is late and is type ' + arrow.dateType);
             updateArrowTime(arrow);
         }
     }
-    else if (arrowIsInPast(arrow.until)){
+    else if (arrowIsExpired(arrow.until)){
         deleteArrow(arrow._id);
     }
 }
@@ -62,12 +62,17 @@ function deleteArrow(arrowId) {
     });
 }
 
-function arrowIsInPast(timeToCheck) {
+function arrowIsExpired(timeToCheck) {
     const timeNow = (new Date()).getTime();
     return timeNow - timeToCheck > 0;
 }
 
 function updateArrowTime(arrow){
+    const dayOfWeek = (new Date()).getDay();
+    const Sunday = 0;
+    const Thursday = 4;
+    const Friday = 5;
+    const Saturday = 6;
     if (arrow.dateType === 'once') {
         deleteArrow(arrow._id);
     }
@@ -77,12 +82,41 @@ function updateArrowTime(arrow){
     else if (arrow.dateType === 'weekly') {
         arrow.checkInTime = addDays(arrow.checkInTime, 7);
     }
+    else if (arrow.dateType === 'weekdays') {
+        let daysToAdd = 0;
+        if (dayOfWeek >= Sunday && dayOfWeek <= Thursday) {
+            daysToAdd = 1;
+        }
+        else if (dayOfWeek === Friday){
+            daysToAdd = 3;
+        }
+        // not sure how it could be Saturday because 3 days are added on Fri,
+        // but keeping it here to be safe
+        else if (dayOfWeek === Saturday) {
+            daysToAdd = 2;
+        }
+        arrow.checkInTime = addDays(arrow.checkInTime, daysToAdd);
+    }
+    else if (arrow.dateType === 'weekends') {
+        let daysToAdd = 0;
+        if (dayOfWeek === Saturday) {
+            daysToAdd = 1;
+        }
+        else {
+            daysToAdd = getNumDaysUntilSaturday(dayOfWeek);
+        }
+        arrow.checkInTime = addDays(arrow.checkInTime, daysToAdd);
+    }
     arrow.save((err) => {
         if (err) {
             logger.error('Error saving arrow');
             logger.error(err);
         }
     });
+}
+
+function getNumDaysUntilSaturday(currentDayNum) {
+    return 6 - currentDayNum;
 }
 
 function addDays(timeInMs, numDays){
