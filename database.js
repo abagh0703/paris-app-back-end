@@ -30,7 +30,7 @@ const arrowSchema = new Schema({
     latitude: {type: Number, required: true},
     longitude: {type: Number, required: true},
     dateType: {type: String, required: true, lowercase: true, trim: true,
-    enum: ['once','daily', 'weekly']},
+    enum: ['once','daily', 'weekly', 'weekdays', 'weekends']},
     until: {type: Number, required: false, default: 9999999999999, min: 1000000000000, max: 9999999999999},
     checkInTime: {type: Number, required: true, min: 1000000000000, max: 9999999999999},
     clearedDates: {type: [Number], default: []},
