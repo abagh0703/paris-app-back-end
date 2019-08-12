@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const request = require('request');
 const router = express.Router();
 let { logger, getCheckInPassword, getTwilioSid, getTwilioToken } = require('../utils');
 const accountSid = getTwilioSid();
@@ -38,7 +39,7 @@ router.get('/', (req, res) => {
 function handleArrowCheck(arrow) {
     if (isLate(arrow.checkInTime)){
         logger.debug('is late');
-        executePenalty();
+        executePenalty(arrow.penaltyType);
         if (arrowIsExpired(arrow.until)){
             deleteArrow(arrow._id);
             return;
@@ -124,10 +125,23 @@ function addDays(timeInMs, numDays){
     return timeInMs + numDaysInMs;
 }
 
+const PAYMENTAMOUNT = 20;
 // in the future, alter this so it mass verifies emails and charges you $20
 // that way
-function executePenalty(){
+function executePenalty(penaltyType){
     logger.warn('executing penalty');
+    if (!penaltyType){
+        penaltyType = 'text';
+    }
+    if (penaltyType === 'text') {
+        executeTextPenalty();
+    }
+    else if (penaltyType === 'payment') {
+        executePaymentPenalty(PAYMENTAMOUNT);
+    }
+}
+
+function executeTextPenalty() {
     // const phoneNums = [process.env.OWNERPHONE, process.env.PERSON1PHONE, process.env.PERSON2PHONE];
     // TODO remove comment above and delete below when ready for production!
     const phoneNums = [process.env.OWNERPHONE, process.env.PERSON1PHONE];
@@ -141,6 +155,48 @@ function executePenalty(){
         })
         .then(message => {logger.debug(message)})
         .done();
+    });
+}
+// executePaymentPenalty();
+function executePaymentPenalty(paymentAmount){
+    const currentTimestamp = (new Date().getTime());
+    const options = { method: 'POST',
+        url: `${process.env.PAYPALURL}/v1/oauth2/token`,
+        auth: {
+            user: process.env.PAYPALCLIENTID,
+            password: process.env.PAYPALSECRET
+        },
+        form: { grant_type: 'client_credentials' } };
+    request(options, function (error, response, body) {
+        if (error) {
+            throw new Error(error);
+        }
+        const accessToken = body.access_token;
+        let options2 = { method: 'POST',
+            url: `${process.env.PAYPALURL}/v1/payments/payouts`,
+            headers:
+                {   Authorization: `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json' },
+            body:
+                { sender_batch_header:
+                        { sender_batch_id: currentTimestamp,
+                            email_subject: 'You have a payout!',
+                            email_message: 'You have received a payout! Thanks for being lucky!' },
+                    items:
+                        [ { recipient_type: 'EMAIL',
+                            amount: { value: paymentAmount, currency: 'USD' },
+                            note: 'Thanks for being lucky!',
+                            sender_item_id: currentTimestamp,
+                            receiver: 'lucky@gmail.com' } ] },
+            json: true };
+
+        request(options2, function (error, response, body) {
+            if (error) throw new Error(error);
+            logger.debug('payment successful');
+            logger.debug(body);
+        });
+
+
     });
 }
 
