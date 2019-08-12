@@ -11,6 +11,7 @@
     "debug": "^4.1.1",
     "dotenv": "^8.0.0",
     "express": "~4.16.0",
+    "lodash": "^4.17.15",
     "mongoose": "^5.6.4",
     "morgan": "~1.9.0",
     "supports-color": "^7.0.0",
