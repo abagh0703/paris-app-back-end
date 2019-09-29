@@ -125,7 +125,7 @@ function addDays(timeInMs, numDays){
     return timeInMs + numDaysInMs;
 }
 
-const PAYMENTAMOUNT = 20;
+const PAYMENT_AMOUNT = 15;
 // in the future, alter this so it mass verifies emails and charges you $20
 // that way
 function executePenalty(penaltyType){
@@ -137,7 +137,7 @@ function executePenalty(penaltyType){
         executeTextPenalty();
     }
     else if (penaltyType === 'payment') {
-        executePaymentPenalty(PAYMENTAMOUNT);
+        executePaymentPenalty(PAYMENT_AMOUNT);
     }
 }
 
@@ -157,8 +157,27 @@ function executeTextPenalty() {
         .done();
     });
 }
-// executePaymentPenalty();
+
+// executePaymentPenalty(1);
 function executePaymentPenalty(paymentAmount){
+    request.post('https://www.beeminder.com/api/v1/charges.json', {
+        json: {
+            auth_token: process.env.BEEMINDER_AUTH_TOKEN,
+            amount: paymentAmount,
+            note: 'Payment for not being at the right location at the right time'
+        }
+    }, (error, res, body) => {
+        if (error) {
+            logger.error(error);
+            return
+        }
+        logger.debug('Successfully charged!');
+        logger.debug(`statusCode: ${res.statusCode}`);
+        logger.debug(body);
+      }
+    );
+
+    /** PAYPAL CODE
     const currentTimestamp = (new Date().getTime());
     const options = { method: 'POST',
         url: `${process.env.PAYPALURL}/v1/oauth2/token`,
@@ -198,6 +217,7 @@ function executePaymentPenalty(paymentAmount){
 
 
     });
+     */
 }
 
 function isOnTime(checkInTime){

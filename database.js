@@ -36,7 +36,7 @@ const arrowSchema = new Schema({
     clearedDates: {type: [Number], default: []},
     label: {type: String, default: 'Arrow', required: false},
     arrowType: {type: String, enum: ['beSomewhere', 'leaveSomewhere'],
-    penaltyType: {type: String, default: 'text', enum: ['text', 'payment']},
+    penaltyType: {type: String, default: 'payment', enum: ['text', 'payment']},
     default: 'beSomewhere'},
 });
 const arrowModel = mongoose.model('Arrows', arrowSchema, 'Arrows');
