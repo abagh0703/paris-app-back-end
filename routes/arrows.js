@@ -8,6 +8,7 @@ const authToken = getTwilioToken();
 const client = require('twilio')(accountSid, authToken);
 const { arrowModel }= require('../database');
 const MINUTES_OF_BUFFER = 0;
+const CAN_CHECK_IN_MINS_BEFORE = 10;
 const distanceCheckBufferMeters = 200;
 
 router.get('/arrows', function(req, res) {
@@ -223,7 +224,7 @@ function executePaymentPenalty(paymentAmount){
 function isOnTime(checkInTime){
     const minutesSinceCheckInTime = getMinutesSinceCheckInTime(checkInTime);
     return minutesSinceCheckInTime < MINUTES_OF_BUFFER &&
-        minutesSinceCheckInTime > -MINUTES_OF_BUFFER;
+        minutesSinceCheckInTime > -CAN_CHECK_IN_MINS_BEFORE;
 }
 
 function isLate(checkInTime) {
