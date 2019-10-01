@@ -35,9 +35,8 @@ const arrowSchema = new Schema({
     checkInTime: {type: Number, required: true, min: 1000000000000, max: 9999999999999},
     clearedDates: {type: [Number], default: []},
     label: {type: String, default: 'Arrow', required: false},
-    arrowType: {type: String, enum: ['beSomewhere', 'leaveSomewhere'],
+    arrowType: {type: String, enum: ['beSomewhere', 'leaveSomewhere'], default: 'beSomewhere'},
     penaltyType: {type: String, default: 'payment', enum: ['text', 'payment']},
-    default: 'beSomewhere'},
 });
 const arrowModel = mongoose.model('Arrows', arrowSchema, 'Arrows');
 module.exports.arrowModel = arrowModel;
