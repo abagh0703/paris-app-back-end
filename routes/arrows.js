@@ -9,7 +9,8 @@ const client = require('twilio')(accountSid, authToken);
 const { arrowModel }= require('../database');
 const MINUTES_OF_BUFFER = 0;
 const CAN_CHECK_IN_MINS_BEFORE = 10;
-const distanceCheckBufferMeters = 200;
+const dontBeHomeBufferMeters = 40;
+const beSomewhereBufferMeters = 200;
 
 router.get('/arrows', function(req, res) {
     arrowModel.find({}, (err, arrows) => {
@@ -298,7 +299,16 @@ router.delete('/arrows/:arrowId', (req, res) => {
         const arrowLong = arrow.longitude;
         const shouldBeWithin = arrow.arrowType === 'beSomewhere';
         const shouldNotBeWithin = arrow.arrowType === 'leaveSomewhere';
-        const isWithin = isWithinTarget(userLat, userLong, arrowLat, arrowLong);
+        let isWithin = null;
+        if (shouldBeWithin) {
+          isWithin = isWithinTarget(userLat, userLong, arrowLat, arrowLong, beSomewhereBufferMeters);
+        }
+        else if (shouldNotBeWithin) {
+          isWithin = isWithinTarget(userLat, userLong, arrowLat, arrowLong, dontBeHomeBufferMeters);
+        }
+        else {
+          isWithin = true;
+        }
         if ((isWithin && shouldBeWithin) || (!isWithin && shouldNotBeWithin)){
             updateArrowTime(arrow);
             return res.send({accepted: true, reason: 'Successfully checked in!'});
@@ -310,9 +320,9 @@ router.delete('/arrows/:arrowId', (req, res) => {
     });
 });
 
-function isWithinTarget(userLat, userLong, arrowLat, arrowLong){
+function isWithinTarget(userLat, userLong, arrowLat, arrowLong, bufferMeters){
     const metersFromTarget = getMetersFromTarget(userLat, userLong, arrowLat, arrowLong);
-    if (metersFromTarget - distanceCheckBufferMeters > 0) {
+    if (metersFromTarget - bufferMeters > 0) {
         return false;
     }
     return true;
