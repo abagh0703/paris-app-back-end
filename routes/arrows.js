@@ -9,8 +9,8 @@ const client = require('twilio')(accountSid, authToken);
 const { arrowModel }= require('../database');
 const MINUTES_OF_BUFFER = 0;
 const CAN_CHECK_IN_MINS_BEFORE = 10;
-const dontBeHomeBufferMeters = 40;
-const beSomewhereBufferMeters = 200;
+const dontBeHomeBufferMeters = 80;
+const beSomewhereBufferMeters = 250;
 
 router.get('/arrows', function(req, res) {
     arrowModel.find({}, (err, arrows) => {
