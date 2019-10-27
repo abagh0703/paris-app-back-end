@@ -127,9 +127,8 @@ function addDays(timeInMs, numDays){
     return timeInMs + numDaysInMs;
 }
 
-const PAYMENT_AMOUNT = 0;
-// in the future, alter this so it mass verifies emails and charges you $20
-// that way
+const PAYMENT_AMOUNT = 15
+
 function executePenalty(penaltyType){
     logger.warn('executing penalty');
     if (!penaltyType){
