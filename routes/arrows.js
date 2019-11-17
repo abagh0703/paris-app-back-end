@@ -127,7 +127,7 @@ function addDays(timeInMs, numDays){
     return timeInMs + numDaysInMs;
 }
 
-const PAYMENT_AMOUNT = process.env.PAYMENTAMOUNT;
+const PAYMENT_AMOUNT = parseInt(process.env.PAYMENTAMOUNT);
 
 function executePenalty(penaltyType){
     logger.warn('executing penalty');
