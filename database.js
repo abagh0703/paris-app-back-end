@@ -37,6 +37,7 @@ const arrowSchema = new Schema({
     label: {type: String, default: 'Arrow', required: false},
     arrowType: {type: String, enum: ['beSomewhere', 'leaveSomewhere'], default: 'beSomewhere'},
     penaltyType: {type: String, default: 'payment', enum: ['text', 'payment']},
+    distanceOverride: {type: Number, required: false},
 });
 const arrowModel = mongoose.model('Arrows', arrowSchema, 'Arrows');
 module.exports.arrowModel = arrowModel;

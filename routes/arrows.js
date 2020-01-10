@@ -259,6 +259,7 @@ router.post('/arrows', (req, res) => {
         checkInTime: data.checkInTime,
         label: data.label,
         arrowType: data.arrowType,
+        distanceOverride: data.distanceOverride
     });
     arrow.save((err, newArrow) => {
         if (err) {
@@ -300,10 +301,18 @@ router.delete('/arrows/:arrowId', (req, res) => {
         const shouldNotBeWithin = arrow.arrowType === 'leaveSomewhere';
         let isWithin = null;
         if (shouldBeWithin) {
-          isWithin = isWithinTarget(userLat, userLong, arrowLat, arrowLong, beSomewhereBufferMeters);
+            let distanceToUse;
+            distanceToUse = arrow.distanceOverride ?
+            arrow.distanceOverride :
+            beSomewhereBufferMeters;
+            isWithin = isWithinTarget(userLat, userLong, arrowLat, arrowLong, distanceToUse);
         }
         else if (shouldNotBeWithin) {
-          isWithin = isWithinTarget(userLat, userLong, arrowLat, arrowLong, dontBeHomeBufferMeters);
+            let distanceToUse;
+            distanceToUse = arrow.distanceOverride ?
+            arrow.distanceOverride :
+            dontBeHomeBufferMeters;
+            isWithin = isWithinTarget(userLat, userLong, arrowLat, arrowLong, distanceToUse);
         }
         else {
           isWithin = true;
