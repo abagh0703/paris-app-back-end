@@ -9,7 +9,7 @@ const client = require('twilio')(accountSid, authToken);
 const { arrowModel }= require('../database');
 const MINUTES_OF_BUFFER = 0;
 const CAN_CHECK_IN_MINS_BEFORE = 10;
-const dontBeHomeBufferMeters = 80;
+const dontBeHomeBufferMeters = 250;
 const beSomewhereBufferMeters = 250;
 
 router.get('/arrows', function(req, res) {
@@ -321,10 +321,7 @@ router.delete('/arrows/:arrowId', (req, res) => {
 
 function isWithinTarget(userLat, userLong, arrowLat, arrowLong, bufferMeters){
     const metersFromTarget = getMetersFromTarget(userLat, userLong, arrowLat, arrowLong);
-    if (metersFromTarget - bufferMeters > 0) {
-        return false;
-    }
-    return true;
+    return metersFromTarget - bufferMeters <= 0;
 }
 
 function getMetersFromTarget(userLat, userLong, arrowLat, arrowLong){
