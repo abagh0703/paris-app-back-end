@@ -11,6 +11,6 @@ Copy the `.env.template` file and name it `.env`. Then proceed to fill in the te
 
 ## Running
 ```
-npm install
-npm run start
+yarn install
+yarn run start
 ```
