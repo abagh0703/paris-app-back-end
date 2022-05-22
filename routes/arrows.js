@@ -12,7 +12,7 @@ const MINUTES_OF_BUFFER = 0;
 const CAN_CHECK_IN_MINS_BEFORE = 10;
 const dontBeHomeBufferMeters = 250;
 const beSomewhereBufferMeters = 250;
-const IFTTTFormat = "MMM D, YYYY -- h:sa";
+const IFTTTFormat = "MMM D, YYYY -- h:ma";
 
 router.get('/arrows', function(req, res) {
     arrowModel.find({}, (err, arrows) => {
@@ -249,17 +249,17 @@ function convertMinutesToMs(minutesTime) {
 
 // dateString is type string of format May 21, 2022 at 03:16PM
 function timestampIsNotInIFTTTFormat(dateString) {
-    return moment(dateString, IFTTTFormat, false).isValid();
+    return !moment(dateString, IFTTTFormat, false).isValid();
 }
 
-/** dateString is type string of format May 21, 2022 at 03:16PM.
+/** dateString is type string of format IFTTTFormat. e.g. May 21, 2022 at 03:16PM.
     The time zone used to parse the string is the time zone of the server.
     E.g. I assume the timestamp will always be in PST so I set my server's time zone to PST so it works.
  */
 function convertDateStringToTimestamp(dateString) {
     let momentObj = moment(dateString, IFTTTFormat, false);
     // now convert moment to number of milliseconds
-    return momentObj().valueOf();
+    return momentObj.valueOf();
 }
 
 /** Body parameters for the POST /arrows request:
@@ -270,7 +270,7 @@ function convertDateStringToTimestamp(dateString) {
  *         checkInTime (required): int or string. Represents timestamp in ms that the arrow will first be checked.
  *          Instead of ms timestamp, it can also be of this form: May 21, 2022 at 03:16PM. Useful for use with IFTTT.
  *         label (optional): string. Label for your own purposes when viewing your arrows in the db
- *         arrowType (required): string with one of these values: leaveSomewhere, beSomewhere
+ *         arrowType (optional): string with one of these values: leaveSomewhere, beSomewhere. Default is beSomewhere.
  *         distanceOverride (optional): int. Represents distance in meters that you should be from the lat/long when
  *          checking in
  *         delay (optional): int. If present, will delay the first checkInTime by this number of minutes.
@@ -285,8 +285,8 @@ router.post('/arrows', (req, res) => {
     }
     if (timestampIsNotInMs(checkInTime)){
         if (timestampIsNotInIFTTTFormat(checkInTime)) {
-            logger.warn(checkInTime + ' ("checkInTime" value) is not in ms');
-            return res.status(422).send(checkInTime + ' ("checkInTime" value) is not in ms');
+            logger.warn(checkInTime + ' ("checkInTime" value) is not in ms or format: ' + IFTTTFormat);
+            return res.status(422).send(checkInTime + ' ("checkInTime" value) is not in format: ' + IFTTTFormat);
         }
         else {
             checkInTime = convertDateStringToTimestamp(checkInTime)
