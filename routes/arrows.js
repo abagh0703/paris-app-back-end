@@ -43,6 +43,7 @@ router.get('/', (req, res) => {
 function handleArrowCheck(arrow) {
     if (isLate(arrow.checkInTime)){
         logger.debug('is late');
+        console.log("arrow is late, going into execute penalty function");
         executePenalty(arrow.penaltyType);
         if (arrowIsExpired(arrow.until)){
             deleteArrow(arrow._id);
@@ -79,6 +80,7 @@ function updateArrowTime(arrow){
     const Friday = 5;
     const Saturday = 6;
     if (arrow.dateType === 'once') {
+        console.log("about to delete arrow");
         deleteArrow(arrow._id);
     }
     else if (arrow.dateType === 'daily') {
@@ -133,6 +135,7 @@ const PAYMENT_AMOUNT = parseInt(process.env.PAYMENTAMOUNT);
 
 function executePenalty(penaltyType){
     logger.warn('executing penalty');
+    console.log("executing penatly function");
     if (!penaltyType){
         penaltyType = 'text';
     }
@@ -140,11 +143,13 @@ function executePenalty(penaltyType){
         executeTextPenalty();
     }
     else if (penaltyType === 'payment') {
+        console.log("penalty type is payment");
         executePaymentPenalty(PAYMENT_AMOUNT);
     }
 }
 
 function executeTextPenalty() {
+    console.log("executing text penalty");
     // const phoneNums = [process.env.OWNERPHONE, process.env.PERSON1PHONE, process.env.PERSON2PHONE];
     // TODO remove comment above and delete below when ready for production!
     const phoneNums = [process.env.OWNERPHONE, process.env.PERSON1PHONE];
@@ -163,6 +168,7 @@ function executeTextPenalty() {
 
 // executePaymentPenalty(1);
 function executePaymentPenalty(paymentAmount){
+    console.log("starting executing payment penalty");
     request.post('https://www.beeminder.com/api/v1/charges.json', {
         json: {
             auth_token: process.env.BEEMINDER_AUTH_TOKEN,
@@ -170,7 +176,10 @@ function executePaymentPenalty(paymentAmount){
             note: 'Payment for not being at the right location at the right time'
         }
     }, (error, res, body) => {
+        console.log("ended executing payment penalty");
         if (error) {
+            console.log("error in payment penalty:");
+            console.log(error);
             logger.error(error);
             return
         }
