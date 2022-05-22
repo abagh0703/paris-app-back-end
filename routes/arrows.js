@@ -263,7 +263,7 @@ function convertDateStringToTimestamp(dateString) {
  *         latitude (required): int,
  *         longitude (required): int
  *         dateType (required): string with one of these values: once, daily, weekly, weekdays, weekends,
- *         until (required): int. Represents timestamp in ms; after this time, the arrow will never be checked again,
+ *         until (optional): int. Represents timestamp in ms; after this time, the arrow will never be checked again,
  *         checkInTime (required): int or string. Represents timestamp in ms that the arrow will first be checked.
  *          Instead of ms timestamp, it can also be of this form: May 21, 2022 at 03:16PM. Useful for use with IFTTT.
  *         label (optional): string. Label for your own purposes when viewing your arrows in the db
